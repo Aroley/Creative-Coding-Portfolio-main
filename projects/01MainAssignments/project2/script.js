@@ -1,29 +1,145 @@
-let len = 10;
-let bg;
+let volumeArray = []
+let tileArray = []
+let rectSize = 100
+let tileSpacing = rectSize * 1.1
+let spin = false
+let scrollSpeed = -0.1
+let targetSpeed = 0
+let showResult = false
+let button
 
-function setup() {
-	createCanvas(windowWidth,windowHeight);
-	background(0);
-	frameRate(30);
-	rectMode(CENTER);
-	bg = color(200, 0, 58);
+function preload() {
+	font = loadFont('Montserrat-Black.otf');
+	font = loadFont('Montserrat-Black.ttf');	// fallback font
 }
 
-function  draw() {
-	background(bg);
-	noFill();
-	strokeWeight(5);
-	stroke(0,130, 140);
+function setup() {
+	createCanvas(windowWidth - (windowWidth / 12),windowHeight - (windowHeight / 12))
+	background(100)
+	rectMode(CENTER)
+	textAlign(CENTER)
+	textSize(24)
+	textFont(font);
+	noStroke()
+
+	// Set up volumeArray with numbers from 1 to 100
+	for (let i = 1; i <= 100; i++) {
+		volumeArray.push(i)
+	}
+	volumeArray = shuffle(volumeArray)
+
+	// Create Tiles for array
+	for (let i = 0; i < volumeArray.length; i++) {
+		let col = color(200, 100, 50)
+		let xPos = i * tileSpacing
+		tileArray[i] = new Tile(xPos, height/2-100, col, volumeArray[i])
+	}
+
+	button = createButton("SPIN")
+	button.mouseClicked(spinToggle)
+	button.size(200, 100)
+	button.position(width / 2-100, height / 2)
+	button.style("font-family", "Montserrat-Black")
+	button.style("font-size", "48px")
+}
+
+function draw() {
+	textAlign(CENTER)
+	background(100)
+
+	// Draw background
+	/* 
+	TODO
+	*/
+
+	// Move and display each tile
+	for (let i = 0; i < tileArray.length; i++) {
+		tileArray[i].move()
+		tileArray[i].makeTile()
+	}
+
+	// If scrolling is stopped, find the middle tile and display result
+	if (!spin && showResult) {
+		let middleTile = getMiddleTile()
+		text(`Middle Tile: ${middleTile.value}`, width / 2, height - 50)
+	}
+
+	// Gradually spin
+	if(spin&&scrollSpeed<16){ 
+		scrollSpeed += 1
+	}else if(!spin&&scrollSpeed>0){
+		scrollSpeed=lerp(scrollSpeed, targetSpeed, 0.01) // Gradual slowdown into stop (thanks Flo)	
+	}
 	
-	ellipse(pmouseX, pmouseY, len, len)
-  //height - mouseY mirrors the object along y axis
-  	ellipse(pmouseX, height - pmouseY, len, len)
-	//increase the lenght by 1px every frame
-	len++;
-	
-	if(mouseIsPressed) {
-		len = 0;  
-		bg = color(189, 3, 33);
+
+}
+
+// Randomize array and toggle spin state
+function spinToggle() {
+	showResult = false
+	spin = !spin
+
+	if (spin) {
+		shuffleArray()
+		button.html("STOP")
+	} else {
+		textAlign(LEFT)
+		button.html("SET VOLUME")
+		showResult = true
+	}
+
+}
+
+// Shuffle array as key is pressed and tiles aren't spinning
+function shuffleArray() {
+
+		volumeArray = shuffle(volumeArray)
+		for (let i = 0; i < tileArray.length; i++) {
+			tileArray[i].value = volumeArray[i]
 	}
 }
 
+// Get middle msot tile
+function getMiddleTile() {
+	let centerX = width / 2
+	let closestTile
+	let minDist = 100
+
+	for (let i = 0; i < tileArray.length; i++) {
+		let tile = tileArray[i]
+		let distanceToCenter = abs(tile.x - centerX) // Absolute distance from middle
+		if (distanceToCenter < minDist) {
+			minDist = distanceToCenter
+			closestTile = tile
+		}
+	}
+	return closestTile
+}
+
+class Tile {
+	constructor(x, y, col, value) {
+		this.x = x
+		this.y = y
+		this.col = col
+		this.value = value
+	}
+
+	move() {
+		this.x -= scrollSpeed
+
+		// Move tile to right as soon as off screen
+		if (this.x < -rectSize) {
+			this.x = (tileArray.length - 1) * tileSpacing
+		}
+	}
+
+	makeTile() {
+		push()
+		translate(this.x, this.y)
+		fill(this.col)
+		rect(0, 0, rectSize, rectSize)
+		fill(255)
+		text(this.value, 0, 5)
+		pop()
+	}
+}

@@ -77,7 +77,7 @@ function draw() {
 	}
 
 	// Gradually spin
-	if(spin&&scrollSpeed<16){ 
+	if(spin&&scrollSpeed<20){ 
 		scrollSpeed += 1
 	}else if(!spin&&scrollSpeed>0){
 		scrollSpeed=lerp(scrollSpeed, targetSpeed, 0.01) // Gradual slowdown into stop (thanks Flo)	
@@ -147,7 +147,7 @@ class Tile {
 
 		// Move tile to right as soon as off screen
 		if (this.x < -rectSize) {
-			this.x = (tileArray.length - 1) * tileSpacing
+			this.x = (tileArray.length-1) * tileSpacing
 		}
 	}
 

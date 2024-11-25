@@ -3,10 +3,12 @@ let tileArray = []
 let rectSize = 100
 let tileSpacing = rectSize * 1.1
 let spin = false
-let scrollSpeed = -0.1
+let scrollSpeed = 0.1
 let targetSpeed = 0
 let showResult = false
 let button
+let volume = 0
+let middeleTile=0
 
 function preload() {
 	font = loadFont('Montserrat-Black.otf');
@@ -21,6 +23,7 @@ function setup() {
 	textSize(24)
 	textFont(font);
 	noStroke()
+
 
 	// Set up volumeArray with numbers from 1 to 100
 	for (let i = 1; i <= 100; i++) {
@@ -44,9 +47,15 @@ function setup() {
 }
 
 function draw() {
-	textAlign(CENTER)
 	background(100)
-
+	textAlign(CENTER)
+	let titleText="Spin to set your volume!"
+	textSize(42)
+	text(titleText,width/2,200)
+	textSize(30)
+	text("Current Volume: "+volume, width *0.8, height - 150)
+	
+	
 	// Draw background
 	/* 
 	TODO
@@ -60,8 +69,11 @@ function draw() {
 
 	// If scrolling is stopped, find the middle tile and display result
 	if (!spin && showResult) {
-		let middleTile = getMiddleTile()
-		text(`Middle Tile: ${middleTile.value}`, width / 2, height - 50)
+		middleTile = getMiddleTile()
+		//text(`🔊 ${middleTile.value}`, width / 2, height - 50)
+		textSize(42)
+		text(`${middleTile.value}`, width / 2, height / 2+50)
+		textSize(24)
 	}
 
 	// Gradually spin
@@ -71,6 +83,12 @@ function draw() {
 		scrollSpeed=lerp(scrollSpeed, targetSpeed, 0.01) // Gradual slowdown into stop (thanks Flo)	
 	}
 	
+	if(!spin&&scrollSpeed<=0.01){
+		button.show()
+		button.html("SPIN")
+		volume=middleTile.value
+		
+	}
 
 }
 
@@ -84,8 +102,8 @@ function spinToggle() {
 		button.html("STOP")
 	} else {
 		textAlign(LEFT)
-		button.html("SET VOLUME")
 		showResult = true
+		button.hide()
 	}
 
 }

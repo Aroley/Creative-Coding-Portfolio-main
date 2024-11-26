@@ -38,13 +38,13 @@ function setup() {
 	for (let i = 0; i < volumeArray.length; i++) {
 		let col = color(200, 100, 50)
 		let xPos = i * tileSpacing
-		tileArray[i] = new Tile(xPos, height/2-100, col, volumeArray[i])
+		tileArray[i] = new Tile(xPos, height*0.45, col, volumeArray[i])
 	}
 
 	button = createButton("SPIN")
 	button.mouseClicked(spinToggle)
 	button.size(200, 100)
-	button.position(width / 2-100, height / 2)
+	button.position(width / 2-100, height*0.55)
 	button.style("font-family", "Montserrat-Black")
 	button.style("font-size", "48px")
 }
@@ -56,13 +56,16 @@ function draw() {
 	textSize(42)
 	text(titleText,width/2,200)
 	textSize(30)
-	text("Current Volume: "+volume, width *0.8, height - 150)
+	text("Current Volume: "+volume, width *0.8, height *0.6)
 	
 	
 	// Draw background
 	/* 
 	TODO
 	*/
+
+
+	
 
 	// Move and display each tile
 	for (let i = 0; i < tileArray.length; i++) {
@@ -77,13 +80,13 @@ function draw() {
 		
 		//text(`🔊 ${middleTile.value}`, width / 2, height - 50) // Emoji not displaying :(
 		textSize(42)
-		text(`${middleTile.value}`, width / 2, height / 2+50)
+		text(`${middleTile.value}`, width / 2, height*0.6)
 		textSize(24)
 	}
 
 	// Gradually spin
 	if(spin&&scrollSpeed<20){ 
-		scrollSpeed += 1
+		scrollSpeed += 2
 	}else if(!spin&&scrollSpeed>0){
 		scrollSpeed=lerp(scrollSpeed, targetSpeed, random(0.02,0.002)) // Gradual slowdown into stop (thanks Flo)	
 	}
@@ -102,9 +105,12 @@ function draw() {
 			volume = middleTile.value
 		}
         
-    
-		
 	}
+
+	// Pointer to show selection
+	fill(255,0,0)
+	triangle(width/2, height*0.4, width*0.48, height*0.35, width*0.52, height*0.35);
+	fill(255)
 
 }
 
@@ -136,7 +142,7 @@ function shuffleArray() {
 
 // Get middle msot tile
 function getMiddleTile() {
-	let centerX = width / 2
+	let centerX = width / 2+(rectSize/2) // Compensating for adjustments made
 	let closestTile
 	let minDist = 100
 
@@ -160,21 +166,24 @@ class Tile {
 	}
 
 	move() {
-		this.x -= scrollSpeed
-
-		// Move tile to right as soon as off screen
-		if (this.x < -rectSize) {
-			this.x = (tileArray.length-1) * tileSpacing
+		this.x -= scrollSpeed;
+		// Wrap around when the tile moves off the left side
+		let totalWidth = tileArray.length * tileSpacing;
+		// Keep x within the bounds of 0 and totalWidth
+		this.x = (this.x + totalWidth) % totalWidth;
+		// If it goes off the left side, ensure it correctly wraps to the right
+		if (this.x < 0) {
+		this.x += totalWidth;
 		}
-	}
+		}
 
 	makeTile() {
 		push()
 		translate(this.x, this.y)
 		fill(this.col)
-		rect(0, 0, rectSize, rectSize)
+		rect(-rectSize/2, 0, rectSize, rectSize)
 		fill(255)
-		text(this.value, 0, 5)
+		text(this.value, -rectSize/2, 10)
 		pop()
 	}
 }

@@ -3,12 +3,13 @@ let tileArray = []
 let rectSize = 100
 let tileSpacing = rectSize * 1.1
 let spin = false
-let scrollSpeed = 0.1
+let scrollSpeed = 0
 let targetSpeed = 0
 let showResult = false
 let button
-let volume = 0
-let middeleTile=0
+let volume=0
+let middleTile=0
+let firstVisit
 
 function preload() {
 	font = loadFont('Montserrat-Black.otf');
@@ -23,6 +24,8 @@ function setup() {
 	textSize(24)
 	textFont(font);
 	noStroke()
+
+	firstVisit=true;
 
 
 	// Set up volumeArray with numbers from 1 to 100
@@ -67,10 +70,12 @@ function draw() {
 		tileArray[i].makeTile()
 	}
 
-	// If scrolling is stopped, find the middle tile and display result
+	// When stopping, find the middle tile and display result
 	if (!spin && showResult) {
+	
 		middleTile = getMiddleTile()
-		//text(`🔊 ${middleTile.value}`, width / 2, height - 50)
+		
+		//text(`🔊 ${middleTile.value}`, width / 2, height - 50) // Emoji not displaying :(
 		textSize(42)
 		text(`${middleTile.value}`, width / 2, height / 2+50)
 		textSize(24)
@@ -80,13 +85,24 @@ function draw() {
 	if(spin&&scrollSpeed<20){ 
 		scrollSpeed += 1
 	}else if(!spin&&scrollSpeed>0){
-		scrollSpeed=lerp(scrollSpeed, targetSpeed, 0.01) // Gradual slowdown into stop (thanks Flo)	
+		scrollSpeed=lerp(scrollSpeed, targetSpeed, random(0.02,0.002)) // Gradual slowdown into stop (thanks Flo)	
 	}
 	
+	// Show button & update volume
 	if(!spin&&scrollSpeed<=0.01){
 		button.show()
 		button.html("SPIN")
-		volume=middleTile.value
+
+		 if (!middleTile) {
+            middleTile = getMiddleTile();
+        }
+		if(firstVisit){
+			volume=0
+		}else{
+			volume = middleTile.value
+		}
+        
+    
 		
 	}
 
@@ -94,6 +110,7 @@ function draw() {
 
 // Randomize array and toggle spin state
 function spinToggle() {
+	firstVisit = false
 	showResult = false
 	spin = !spin
 

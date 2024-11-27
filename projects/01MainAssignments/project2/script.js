@@ -1,6 +1,6 @@
 let volumeArray = []
 let tileArray = []
-let rectSize = 100
+let rectSize = 140
 let tileSpacing = rectSize * 1.1
 let spin = false
 let scrollSpeed = 0
@@ -10,59 +10,65 @@ let button
 let volume=0
 let middleTile=0
 let firstVisit
+let maxVolume =100
+
 
 function preload() {
-	font = loadFont('Montserrat-Black.otf');
-	font = loadFont('Montserrat-Black.ttf');	// fallback font
+	font = loadFont('Montserrat-Black.otf')
+	// font = loadFont('Montserrat-Black.ttf')	// fallback font
+	
 }
 
 function setup() {
-	createCanvas(windowWidth - (windowWidth / 12),windowHeight - (windowHeight / 12))
+	createCanvas(windowWidth,windowHeight)
 	background(100)
 	rectMode(CENTER)
 	textAlign(CENTER)
-	textSize(24)
+	textSize(32)
 	textFont(font);
+	strokeCap(SQUARE)
 	noStroke()
 
 	firstVisit=true;
+	
+	
 
 
 	// Set up volumeArray with numbers from 1 to 100
-	for (let i = 1; i <= 100; i++) {
+	for (let i = 1; i <= maxVolume; i++) {
 		volumeArray.push(i)
 	}
 	volumeArray = shuffle(volumeArray)
 
 	// Create Tiles for array
 	for (let i = 0; i < volumeArray.length; i++) {
-		let col = color(200, 100, 50)
+		let col = color(255)
 		let xPos = i * tileSpacing
-		tileArray[i] = new Tile(xPos, height*0.45, col, volumeArray[i])
+		tileArray[i] = new Tile(xPos, height*0.5, col, volumeArray[i])
 	}
 
 	button = createButton("SPIN")
 	button.mouseClicked(spinToggle)
-	button.size(200, 100)
-	button.position(width / 2-100, height*0.55)
+	button.size(400, 100)
+	button.position(width / 2-200, height*0.67)
 	button.style("font-family", "Montserrat-Black")
 	button.style("font-size", "48px")
 }
 
 function draw() {
-	background(100)
+	background(20)
 	textAlign(CENTER)
-	let titleText="Spin to set your volume!"
-	textSize(42)
-	text(titleText,width/2,200)
+	let titleText="SPIN TO \nSET YOUR VOLUME!"
+	textSize(100)
+	fill(20)
+	stroke("#6610f2")
+	strokeWeight(4)
+	text(titleText,width/2,height*0.205)
+	fill(255)
+	noStroke()
+	text(titleText,width*0.505,height*0.2)
 	textSize(30)
-	text("Current Volume: "+volume, width *0.8, height *0.6)
-	
-	
-	// Draw background
-	/* 
-	TODO
-	*/
+	text("CURRENT VOLUME: "+volume, width / 2, height*0.84)
 
 
 	
@@ -79,9 +85,9 @@ function draw() {
 		middleTile = getMiddleTile()
 		
 		//text(`🔊 ${middleTile.value}`, width / 2, height - 50) // Emoji not displaying :(
-		textSize(42)
-		text(`${middleTile.value}`, width / 2, height*0.6)
-		textSize(24)
+		textSize(54)
+		text(`${middleTile.value}`, width / 2, height*0.74)
+		textSize(32)
 	}
 
 	// Gradually spin
@@ -108,9 +114,10 @@ function draw() {
 	}
 
 	// Pointer to show selection
-	fill(255,0,0)
-	triangle(width/2, height*0.4, width*0.48, height*0.35, width*0.52, height*0.35);
-	fill(255)
+	stroke("#6610f2")
+	//triangle(width/2, height*0.4, width*0.48, height*0.35, width*0.52, height*0.35);
+	line(width/2,height*0.4,width/2,height*0.6)
+	
 
 }
 
@@ -128,7 +135,6 @@ function spinToggle() {
 		showResult = true
 		button.hide()
 	}
-
 }
 
 // Shuffle array as key is pressed and tiles aren't spinning
@@ -181,8 +187,8 @@ class Tile {
 		push()
 		translate(this.x, this.y)
 		fill(this.col)
-		rect(-rectSize/2, 0, rectSize, rectSize)
-		fill(255)
+		rect(-rectSize/2, 0, rectSize, rectSize,0,20,0,20)
+		fill(20)
 		text(this.value, -rectSize/2, 10)
 		pop()
 	}
